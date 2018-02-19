@@ -24,16 +24,20 @@ public class ImageProcessing {
 
     /**
      * Called when the activity is first created.
-     * 시작할때 생성자
+     * 시작할때 생성자 - constructor
      */
     // processing() 넣으셈
-
+    public ImageProcessing()
+    {
+        processImage();
+    }
 
     /**
      * Save the result image to the database.
      * 이미지 저장하는 함수
      * @param view --> 변경
      */
+
 
 
     /**
@@ -68,6 +72,7 @@ public class ImageProcessing {
         // apply histogram equalization
         Mat equalized = new Mat(rows, cols, CvType.CV_32FC1);
         Imgproc.equalizeHist(MatSnapShot, equalized);
+
 
         // convert to float, very important
         Mat floated = new Mat(rows, cols, CvType.CV_32FC1);
