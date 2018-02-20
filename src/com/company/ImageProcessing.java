@@ -27,8 +27,9 @@ public class ImageProcessing {
      * 시작할때 생성자 - constructor
      */
     // processing() 넣으셈
-    public ImageProcessing()
+    public ImageProcessing(Mat srcImage)
     {
+        MatSnapShot = srcImage;
         processImage();
     }
 
