@@ -42,9 +42,11 @@ public class Main extends Application {
         in_image = Imgcodecs.imread("C:\\Users\\sungmin\\Desktop\\projectjava\\firstProject-test\\AF1.jpg");
 
 
-
+        //preprocessing 하는부분
         pp.GetMatrix(in_image);
         pp.Resize();
+        pp.GrayScaling();
+        pp.Masking();
 
 
         // 문제는 바로 이 부분 Mat 으로 된 in_image의 경우 Javafx나 swt 등에서 바로 ImageView를 할 수 없기에
