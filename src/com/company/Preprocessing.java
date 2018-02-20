@@ -97,4 +97,24 @@ public class Preprocessing {
         GetMatrix(matMasking);
 //      roi.release();
     }
+
+    public void HistogramEqualize()
+    {
+        //
+    }
+
+    public void RidgeOrientationFilter()
+    {
+        //
+    }
+
+    public void Thresholding()
+    {
+
+    }
+
+    public void Thining()
+    {
+
+    }
 }
