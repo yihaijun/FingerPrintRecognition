@@ -795,8 +795,8 @@ public class ImageProcessing {
         Mat result = new Mat(source.cols(), source.rows(), CvType.CV_32FC1);
         Core.multiply(source, mask, result, 1.0, CvType.CV_32FC1);
 
-        logMat(source);
-        logMat(result);
+        //logMat(source);
+        //logMat(result);
 
         int length = (int) (result.total());
         float[] values = new float[length];
@@ -967,65 +967,6 @@ public class ImageProcessing {
         Mat kernel = new Mat(kSize, kSize, CvType.CV_32FC1);
         Core.gemm(kernelX, kernelY.t(), 1, Mat.zeros(kSize, kSize, CvType.CV_32FC1), 0, kernel, 0);
         return kernel;
-    }
-
-    /**
-     * Create Gaussian kernel.
-     *
-     * @param sigma
-     */
-    private Mat gaussianKernel_(int kSize, int sigma) {
-
-        Mat kernel = new Mat(kSize, kSize, CvType.CV_32FC1);
-
-        double total = 0;
-        int l = kSize / 2;
-        double distance = 0;
-        double value = 0;
-
-        for (int y = -l; y <= l; y++) {
-            for (int x = -l; x <= l; x++) {
-                distance = ((x * x) + (y * y)) / (2 * (sigma * sigma));
-                value = Math.exp(-distance);
-                kernel.put(y + l, x + l, value);
-                total += value;
-            }
-        }
-
-        for (int y = 0; y < kSize; y++) {
-            for (int x = 0; x < kSize; x++) {
-                value = kernel.get(y, x)[0];
-                value /= total;
-                kernel.put(y, x, value);
-            }
-        }
-
-        return kernel;
-    }
-
-    /**
-     * Print/Log the given mat.
-     *
-     * @param mat
-     */
-    private void logMat(Mat mat) {
-
-        int width = mat.width();
-        int height = mat.height();
-
-        ArrayList<Double> list = new ArrayList<Double>();
-
-        System.out.println("Start Printing Mat");
-
-        for (int y = 0; y < height; y++) {
-            list.clear();
-            for (int x = 0; x < width; x++) {
-                list.add(mat.get(y, x)[0]);
-            }
-            System.out.println(list.toString());
-        }
-
-        System.out.println("Finish Printing Mat");
     }
 
     /**
