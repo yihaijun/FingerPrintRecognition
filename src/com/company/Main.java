@@ -32,25 +32,36 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
 
         Preprocessing pp = new Preprocessing();
+        //Preprocessing pp1 = new Preprocessing();
 
         Stage stage = new Stage();
         Group root = new Group();
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         Mat in_image = new Mat();
+        Mat in_image1 = new Mat();
         // 이미지 불로오는 부분
 
-        in_image = Imgcodecs.imread("C:\\Users\\sungmin\\Desktop\\projectjava\\firstProject-test\\AF1.jpg");
-
+        //in_image = Imgcodecs.imread("C:\\Users\\sungmin\\Desktop\\projectjava\\firstProject-test\\AF1.jpg");
+        in_image = Imgcodecs.imread("C:\\Users\\sungmin\\Desktop\\projectjava\\firstProject-test\\AF2.jpg");
         //in_image = Imgcodecs.imread("C:\\Users\\sungmin\\Desktop\\projectjava\\firstProject-test\\test02.png");
 
         //preprocessing 하는부분
         pp.GetMatrix(in_image);
-        pp.Resize();
-        pp.GrayScaling();
-        pp.Masking();
-        pp.HistogramEqualize();
-        pp.RidgeOrientationFilter();
+        pp.Process();
 
+
+        /*
+        pp1.GetMatrix(in_image1);
+        pp1.Resize();
+        pp1.GrayScaling();
+        pp1.Masking();
+        pp1.HistogramEqualize();
+        pp1.RidgeOrientationFilter();
+        */
+
+        //Matching m = new Matching();
+
+        //System.out.println("점수는요 : " + m.Match(pp.SetMatrix(),pp1.SetMatrix()));
 
 
         // 문제는 바로 이 부분 Mat 으로 된 in_image의 경우 Javafx나 swt 등에서 바로 ImageView를 할 수 없기에
@@ -88,6 +99,10 @@ public class Main extends Application {
         Scene scene = new Scene(root, width, height);
         stage.setScene(scene);
         stage.show();
+
+
+
+
 
     }
 
