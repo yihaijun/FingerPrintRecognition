@@ -1,10 +1,7 @@
 package com.company;
 
 import org.opencv.core.*;
-import org.opencv.features2d.DescriptorExtractor;
-import org.opencv.features2d.DescriptorMatcher;
-import org.opencv.features2d.FeatureDetector;
-import org.opencv.features2d.Features2d;
+import org.opencv.features2d.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -97,6 +94,8 @@ public class Matching {
         Features2d.drawMatches(image1, keyPoints1, image2, keyPoints2, goodMatches, result, red, blue, mask, flag);
 
         int score = goodMatchesList.size();
+
+        //return result;
         return score;
     }
 }

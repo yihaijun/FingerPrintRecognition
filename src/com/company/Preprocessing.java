@@ -13,10 +13,13 @@ package com.company;
 /////
 
 import org.opencv.core.*;
+import org.opencv.features2d.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Preprocessing {
 
@@ -50,11 +53,7 @@ public class Preprocessing {
         matSrcImage = matInput;
     }
 
-    /**
-     *
-     * @param void
-     * @return Mat
-     */
+
     public Mat SetMatrix()
     {
         return matSrcImage;
@@ -62,7 +61,7 @@ public class Preprocessing {
 
     public void Process()
     {
-        //Resize();
+        Resize();
         GrayScaling();
 
         int rows = matSrcImage.rows();
@@ -174,8 +173,13 @@ public class Preprocessing {
 
         // method 2: fill with gray instead of while
         roi.setTo(scalarWhite);
-         //ellipse -- Core 에서 Imgproc 로 바꿨더니 됨~
-        Imgproc.ellipse(roi, center, axes, 0, 0, 360, scalarBlack, thickness, lineType, 0);
+
+        //ellipse -- Core 에서 Imgproc 로 바꿨더니 됨~
+
+        // opencv 3.x
+        //Imgproc.ellipse(roi, center, axes, 0, 0, 360, scalarBlack, thickness, lineType, 0);
+        // opencv 2.x
+        Core.ellipse(roi, center, axes, 0, 0, 360, scalarBlack, thickness, lineType, 0);
         matMasking.setTo(scalarGray, roi);
         GetMatrix(matMasking);
 //      roi.release();
@@ -236,7 +240,12 @@ public class Preprocessing {
 
                 roi = new Rect((blockSize) * (x - 1), (blockSize) * (y - 1), blockSize, blockSize);
                 windowMask.setTo(scalarBlack);
-                Imgproc.rectangle(windowMask, new Point(roi.x, roi.y), new Point(roi.x + roi.width, roi.y + roi.height), scalarWhile, -1, 8, 0);
+
+                //opencv 2.x
+                Core.rectangle(windowMask, new Point(roi.x, roi.y), new Point(roi.x + roi.width, roi.y + roi.height), scalarWhile, -1, 8, 0);
+
+                //opencv 3.x
+                //Imgproc.rectangle(windowMask, new Point(roi.x, roi.y), new Point(roi.x + roi.width, roi.y + roi.height), scalarWhile, -1, 8, 0);
 
                 window = source.submat(roi);
                 Core.meanStdDev(window, mean, std);
@@ -982,17 +991,14 @@ public class Preprocessing {
         if (height % blockSize != 0) {
             rightPadding = blockSize - (height % blockSize);
         }
-        Core.copyMakeBorder(source, source, 0, bottomPadding, 0, rightPadding, Core.BORDER_CONSTANT, Scalar.all(0));
+        //opencv 3.x version
+        //Core.copyMakeBorder(source, source, 0, bottomPadding, 0, rightPadding, Core.BORDER_CONSTANT, Scalar.all(0));
+
+        //opencv 2.x version
+        Imgproc.copyMakeBorder(source, source, 0, bottomPadding, 0, rightPadding, Imgproc.BORDER_CONSTANT, Scalar.all(0));
         return source;
     }
 
-    /**
-     * Calculate bitwise atan2 for the given 2 images.
-     *
-     * @param src1
-     * @param src2
-     * @param dstn
-     */
     private void atan2(Mat src1, Mat src2, Mat dst) {
 
         int height = src1.height();
@@ -1125,8 +1131,97 @@ public class Preprocessing {
         int lineType = 8;
 
         Mat mask = new Mat(rows, cols, CvType.CV_8UC1, scalarBlack);
-        Imgproc.ellipse(mask, center, axes, 0, 0, 360, scalarWhite, thickness, lineType, 0);
+
+        //opencv 2.x
+        Core.ellipse(mask, center, axes, 0, 0, 360, scalarWhite, thickness, lineType, 0);
+
+        //opencv 3.x
+        //Imgproc.ellipse(mask, center, axes, 0, 0, 360, scalarWhite, thickness, lineType, 0);
         return mask;
     }
+
+
+    //////////////////////////////////////////////matching/////////////////////////////////////////////////////
+    public static int matching(Mat image1, Mat image2) {
+
+        List<DMatch> matchesList;
+        List<DMatch> goodMatchesList = new LinkedList<DMatch>();
+        MatOfPoint2f goodPoints1 = new MatOfPoint2f();
+        MatOfPoint2f goodPoints2 = new MatOfPoint2f();
+        List<Point> goodPointsList1 = new LinkedList<Point>();
+        List<Point> goodPointsList2 = new LinkedList<Point>();
+
+        Mat descriptor1 = new Mat();
+        Mat descriptor2 = new Mat();
+
+        FeatureDetector detector = FeatureDetector.create(FeatureDetector.SIFT);
+        DescriptorExtractor extractor = DescriptorExtractor.create(DescriptorExtractor.SIFT);
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
+
+        MatOfKeyPoint keyPoints1 = new MatOfKeyPoint();
+        MatOfKeyPoint keyPoints2 = new MatOfKeyPoint();
+        MatOfDMatch matches = new MatOfDMatch();
+        MatOfDMatch goodMatches = new MatOfDMatch();
+
+        // detect features
+        detector.detect(image1, keyPoints1);
+        detector.detect(image2, keyPoints2);
+
+        // extract features
+        extractor.compute(image1, keyPoints1, descriptor1);
+        extractor.compute(image2, keyPoints2, descriptor2);
+
+        // match features
+        matcher.match(descriptor1, descriptor2, matches);
+        matchesList = matches.toList();
+
+        // find good matches
+        double MatchingThreshold = 45;
+        double minDist = MatchingThreshold;
+        double min = 1000000;
+        double max = 0;
+        double distance;
+        for (int i = 0; i < descriptor1.rows(); i++) {
+            distance = matchesList.get(i).distance;
+            if (distance > max) max = distance;
+            if (distance < min) min = distance;
+            if (distance < minDist) {
+                goodMatchesList.add(matchesList.get(i));
+            }
+        }
+        goodMatches.fromList(goodMatchesList);
+
+        // keyPoints of good matches
+        List<KeyPoint> keyPointsList1 = keyPoints1.toList();
+        List<KeyPoint> keyPointsList2 = keyPoints2.toList();
+        DMatch m;
+        for (int i = 0; i < goodMatchesList.size(); i++) {
+
+            m = goodMatchesList.get(i);
+            goodPointsList1.add(keyPointsList1.get(m.queryIdx).pt);
+            goodPointsList2.add(keyPointsList2.get(m.trainIdx).pt);
+        }
+        goodPoints1.fromList(goodPointsList1);
+        goodPoints2.fromList(goodPointsList2);
+
+        // get homography
+        // Mat homography = Calib3d.findHomography( goodPoints1, goodPoints2, Calib3d.RANSAC, 1.0);
+
+        // draw result
+
+        Mat result = new Mat();
+        Scalar green = new Scalar(0, 255, 0);
+        Scalar yellow = new Scalar(255, 255, 0);
+        Scalar blue = new Scalar(0, 0, 255);
+        Scalar red = new Scalar(255, 0, 0);
+        MatOfByte mask = new MatOfByte();
+        int flag = Features2d.NOT_DRAW_SINGLE_POINTS;
+        Features2d.drawMatches(image1, keyPoints1, image2, keyPoints2, goodMatches, result, red, blue, mask, flag);
+
+        int score = goodMatchesList.size();
+        return score;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

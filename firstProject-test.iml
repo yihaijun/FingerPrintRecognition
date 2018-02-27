@@ -10,28 +10,14 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/opencv3.3/build/java/opencv-330.jar!/" />
+          <root url="jar://C:/opencv2.4.13/build/java/opencv-2413.jar!/" />
         </CLASSES>
         <JAVADOC />
         <NATIVE>
-          <root url="file://C:/opencv3.3/build/java/x64" />
+          <root url="file://C:/opencv2.4.13/build/java/x64" />
         </NATIVE>
         <SOURCES>
-          <root url="jar://C:/opencv3.3/build/java/opencv-330.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://C:/opencv2.4.13.5/build/java/opencv-2413.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <NATIVE>
-          <root url="file://C:/opencv2.4.13.5/build/java/x64" />
-        </NATIVE>
-        <SOURCES>
-          <root url="jar://C:/opencv2.4.13.5/build/java/opencv-2413.jar!/" />
+          <root url="jar://C:/opencv2.4.13/build/java/opencv-2413.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
